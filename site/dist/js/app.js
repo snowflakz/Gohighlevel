@@ -21,7 +21,7 @@
   $('#manage-consent')?.addEventListener('click',()=>{$('#consent-options').hidden=false;$('#analytics-consent').focus();});
   $('#save-consent')?.addEventListener('click',()=>save($('#analytics-consent').checked,$('#ads-consent').checked));
   $('#cookie-settings')?.addEventListener('click',()=>{$('#consent').hidden=false;$('#analytics-consent').checked=choice.analytics;$('#ads-consent').checked=choice.ads;$('#manage-consent').focus();});
-  document.querySelectorAll('.affiliate').forEach(a=>{a.href=c.AFFILIATE_URL;a.addEventListener('click',()=>{if(choice.analytics&&c.GA4_ID)gtag('event','click_affiliate_cta',{send_to:c.GA4_ID,cta_position:a.dataset.position});});});
+  document.querySelectorAll('.affiliate').forEach(a=>{a.href=a.dataset.offer==='workshop'?c.AI_WORKSHOP_URL:c.AFFILIATE_URL;a.addEventListener('click',()=>{if(choice.analytics&&c.GA4_ID)gtag('event','click_affiliate_cta',{send_to:c.GA4_ID,cta_position:a.dataset.position,offer:a.dataset.offer||'bootcamp'});});});
   document.querySelectorAll('.year').forEach(e=>e.textContent=new Date().getFullYear());
   const form=$('#lead-form');
   if(form && c.ENABLE_EMAIL_CAPTURE && /^https:\/\//.test(c.FORM_ENDPOINT)){

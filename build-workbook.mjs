@@ -80,6 +80,18 @@ s.getRange('B6:G14').values=steps;s.getRange('B6:G14').format.wrapText=true;s.ge
 header(s,17,['Launch gate','Current state','Required action']);
 const gates=[['Brand / email','Provided','BrigePoint / g2wsales@gmail.com. Confirm rights to use BrigePoint.com.'],['Domain connection','Not verified','No DNS or ownership verification performed.'],['Physical address / biography','Missing','Provide truthful owner and mailing details before marketing email activation.'],['Email delivery / analytics','Disabled','Connect form processor, update privacy details, test delivery; add tags only with consent.'],['Referral attribution / checkout','Not verified','Use the exact issued link and verify attribution in the portal.'],['Live bootcamp agenda','Needs confirmation','Resolve outdated chat topic and inconsistent schedule wording.'],['Public launch readiness','Pending gates','Review page, identity, offer and tracking before public promotion.']];
 s.getRange('B18:D24').values=gates;s.getRange('B18:D24').format.wrapText=true;s.getRange('B18:D24').format.rowHeight=64;
+// Cash consistency is tested separately from the gross run-rate target.
+const forecast=sheets.Forecast;
+forecast.getRange('B:B').format.columnWidth=37;
+header(forecast,21,['$5k net cash?','3 months of $5k cash?'],19);
+for(let r=22;r<=45;r++){
+ formula(forecast,`T${r}`,`=IF(P${r}>=$C$18,1,0)`);
+ formula(forecast,`U${r}`,r<24?'=0':`=IF(SUM(T${r-2}:T${r})=3,1,0)`);
+}
+set(forecast,'B54','First $5k net cash proxy month');formula(forecast,'C54','=IF(SUM(T22:T45)=0,"Beyond 24 months",INDEX(B22:B45,MATCH(1,T22:T45,0)))');
+set(forecast,'E54','Third consecutive $5k cash month');formula(forecast,'F54','=IF(SUM(U22:U45)=0,"Beyond 24 months",INDEX(B22:B45,MATCH(1,U22:U45,0)))');
+set(sheets.Decision,'E19','First $5k net cash proxy month');formula(sheets.Decision,'H19','=Forecast!C54');
+set(sheets.Decision,'E21','Third consecutive $5k cash month');formula(sheets.Decision,'H21','=Forecast!F54');
 // Validate recalculation through a driver change, then restore.
 wb.recalculate();const base=sheets.Forecast.getRange('K45').values[0][0];sheets.Forecast.getRange('C8').values=[[0]];wb.recalculate();const zero=sheets.Forecast.getRange('K45').values[0][0];if(zero!==0)throw Error('Zero conversion did not zero customer forecast: '+zero);sheets.Forecast.getRange('C8').values=[[.06]];wb.recalculate();if(Math.abs(sheets.Forecast.getRange('K45').values[0][0]-base)>1e-6)throw Error('Restore failed');
 for(const [cell,expected] of [['G7',3880],['G8',11880],['G9',19880],['E25',90.8]]){const v=sheets.Economics.getRange(cell).values[0][0];if(Math.abs(v-expected)>.001)throw Error(cell+' '+v);}
